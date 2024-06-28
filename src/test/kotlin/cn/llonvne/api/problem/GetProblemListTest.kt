@@ -2,9 +2,12 @@ package cn.llonvne.api.problem
 
 import cn.llonvne.api.requestTo
 import cn.llonvne.domain.Problem
+import cn.llonvne.mapper.FakeProblemMapper
+import cn.llonvne.service.GetProblemListQueriesProcessorServiceProvider
 import io.kotest.matchers.Matcher
 import io.kotest.matchers.MatcherResult
 import io.kotest.matchers.should
+import io.kotest.matchers.shouldBe
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.http4k.core.Body
@@ -16,24 +19,26 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ProblemTest {
+class GetProblemListTest {
     private val request = GetProblemListDescriptor.requestTo()
     private val problems = listOf(
         Problem(id = 1, name = "Llonvne")
     )
-    private val service = GetProblemList {
-        GetProblemListQueryProcessor { query ->
-            when (query) {
-                is GetProblemListQueries.ByIds -> problems.filter { it.id in query.ids }
-                is GetProblemListQueries.ByName -> problems.filter { it.name.contains(query.name) }
-            }
-        }
-    }
+    private val service = GetProblemList(
+        GetProblemListQueriesProcessorServiceProvider(
+            FakeProblemMapper(
+                mutableListOf(
+                    Problem(1, "Llonvne")
+                )
+            )
+        )
+    )
     private val respLens = Body.auto<List<Problem>>().toLens()
 
     @Test
     fun testQueriesSerialized() {
-        println(Json.encodeToString<GetProblemListQueries>(GetProblemListQueries.ByName("123")))
+        Json.encodeToString<GetProblemListQueries>(GetProblemListQueries.ByName("123")) shouldBe
+                """{"type":"ByName","name":"123"}"""
     }
 
     private fun matchProblemsIgnoringTimestamps(expected: List<Problem>): Matcher<List<Problem>> =
@@ -78,7 +83,14 @@ class ProblemTest {
         resp shouldHaveStatus Status.BAD_REQUEST
     }
 
+    @Test
+    fun testIdsResultEmpty() {
+        val resp = service(
+            request.with(GetProblemListQueries.lens of GetProblemListQueries.ByIds(listOf(-1)))
+        )
 
+        resp shouldHaveStatus Status.NO_CONTENT
+    }
 }
 
 

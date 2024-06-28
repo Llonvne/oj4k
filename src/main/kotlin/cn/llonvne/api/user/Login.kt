@@ -1,16 +1,15 @@
 package cn.llonvne.api.user
 
 import cn.llonvne.api.ApiDescriptor
+import cn.llonvne.api.security.SecurityToken
+import cn.llonvne.domain.Token
 import cn.llonvne.domain.User
 import cn.llonvne.service.ServiceProvider
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.http4k.contract.ContractRoute
 import org.http4k.contract.bindContract
-import org.http4k.core.Body
-import org.http4k.core.Method
-import org.http4k.core.Response
-import org.http4k.core.Status
+import org.http4k.core.*
 import org.http4k.format.KotlinxSerialization.auto
 import org.http4k.lens.LensFailure
 
@@ -60,13 +59,15 @@ fun Login(serviceProvider: ServiceProvider<LoginProcessor>): ContractRoute =
             return@handler Response(Status.BAD_REQUEST)
         }
 
-        when (service.login(request)) {
+        when (val resp = service.login(request)) {
             is LoginResult.LoginUserNotFound -> {
                 Response(Status.UNAUTHORIZED).body("username or password incorrect")
             }
 
             is LoginResult.OK -> {
-                Response(Status.OK).body("Login successful")
+                Response(Status.OK).with(
+                    Body.auto<SecurityToken>().toLens() of SecurityToken(Token.UserToken(resp.username))
+                )
             }
 
             is LoginResult.WrongPassword -> {

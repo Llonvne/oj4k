@@ -9,7 +9,7 @@ import org.komapper.core.dsl.operator.desc
 import org.komapper.core.dsl.query.singleOrNull
 import org.komapper.jdbc.JdbcDatabase
 
-class ProblemMapperImpl(val database: JdbcDatabase) : ProblemMapper {
+class ProblemMapperImpl(private val database: JdbcDatabase) : ProblemMapper {
     override fun selectByIdOrNull(id: Int): Problem? {
         return database.runQuery {
             QueryDsl.from(e).where {
@@ -31,6 +31,12 @@ class ProblemMapperImpl(val database: JdbcDatabase) : ProblemMapper {
             QueryDsl.from(e).where {
                 e.name contains content
             }.orderBy(e.createdAt.desc()).limit(500)
+        }
+    }
+
+    override fun insert(problem: Problem): Problem {
+        return database.runQuery {
+            QueryDsl.insert(e).single(problem)
         }
     }
 

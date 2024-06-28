@@ -1,4 +1,5 @@
 import org.gradle.api.JavaVersion.VERSION_11
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
@@ -6,6 +7,7 @@ plugins {
     kotlin("jvm") version "2.0.0"
     kotlin("plugin.serialization") version "2.0.0"
     id("com.google.devtools.ksp") version "2.0.0-1.0.22"
+    kotlin("plugin.power-assert") version "2.0.0"
     application
 }
 
@@ -90,3 +92,6 @@ dependencies {
     testImplementation("io.mockk:mockk:${mockkVersion}")
 }
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
+powerAssert {
+}

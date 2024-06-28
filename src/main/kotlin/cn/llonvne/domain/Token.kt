@@ -11,7 +11,7 @@ sealed interface Token {
 
     @Serializable
     @SerialName("User")
-    data class UserToken(val token: String) : Token
+    data class UserToken(val username: String) : Token
 
     @Serializable
     @SerialName("None")

@@ -1,9 +1,13 @@
 package cn.llonvne.api.user
 
 import cn.llonvne.api.requestTo
+import cn.llonvne.api.security.SecurityToken
+import cn.llonvne.domain.Token
 import cn.llonvne.domain.User
 import cn.llonvne.mapper.FakeUserMapper
 import cn.llonvne.service.LoginProcessorServiceProvider
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.http4k.core.Status
 import org.http4k.core.with
 import org.http4k.kotest.shouldHaveBody
@@ -13,7 +17,7 @@ import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginTest {
-    val users = mutableListOf(User(name = "Admin", password = "Admin"))
+    private val users = mutableListOf(User(name = "Admin", password = "Admin"))
     val handler = Login(
         LoginProcessorServiceProvider(
             FakeUserMapper(users)
@@ -30,7 +34,7 @@ class LoginTest {
         )
 
         resp shouldHaveStatus Status.OK
-        resp shouldHaveBody "Login successful"
+        resp shouldHaveBody Json.encodeToString(SecurityToken(Token.UserToken("Admin")))
     }
 
     @Test

@@ -19,14 +19,14 @@ import org.junit.jupiter.api.Test
 
 class Base64TokenSerialTest {
     private val contexts = RequestContexts()
-    private val key = RequestContextKey.required<Base64<Token>>(contexts)
+    private val key = RequestContextKey.required<SecurityToken>(contexts)
     private val security = OJSecurity(key)
 
     private val app = ServerFilters.InitialiseRequestContext(contexts).then(
         routes("/secure" bind Method.GET to security.filter.then {
             val token = security.token(it)
             Response(OK).with(
-                Body.auto<Base64<Token>>().toLens() of token
+                Body.auto<SecurityToken>().toLens() of token
             )
         })
     )

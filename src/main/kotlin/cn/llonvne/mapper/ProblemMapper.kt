@@ -8,4 +8,6 @@ interface ProblemMapper {
     fun selectByIds(ids: List<Int>): List<Problem>
 
     fun selectByNameContain(content: String): List<Problem>
+
+    fun insert(problem: Problem): Problem
 }

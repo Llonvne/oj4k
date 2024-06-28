@@ -17,4 +17,10 @@ class FakeProblemMapper(
     override fun selectByNameContain(content: String): List<Problem> {
         return problems.filter { it.name.contains(content) }
     }
+
+    override fun insert(problem: Problem): Problem {
+        val pro = problem.copy(id = problems.size)
+        problems.addLast(pro)
+        return pro
+    }
 }

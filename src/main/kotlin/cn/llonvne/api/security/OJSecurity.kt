@@ -16,9 +16,8 @@ import org.http4k.lens.RequestContextLens
 typealias SecurityToken = Base64<Token>
 
 class OJSecurity(
-    val key: RequestContextLens<SecurityToken>, private val allowedApiDescriptor: List<ApiDescriptor> = listOf(
-        LoginDescriptor
-    )
+    val key: RequestContextLens<SecurityToken>,
+    private val allowedApiDescriptor: List<ApiDescriptor> = listOf(LoginDescriptor)
 ) : Security {
 
     private val bearerAuthSecurity = BearerAuthSecurity(key, {

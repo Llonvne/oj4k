@@ -11,8 +11,8 @@ import io.mockk.mockk
 import org.http4k.core.*
 import org.http4k.format.KotlinxSerialization.auto
 import org.http4k.kotest.shouldHaveStatus
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-
 
 class GetProblemByIdKtTest {
     private val request: Request = GetProblemByIdDescriptor.requestTo()
@@ -69,7 +69,6 @@ class GetProblemByIdKtTest {
         )
 
         val resp = handler(req)
-
         resp shouldHaveStatus Status.NO_CONTENT
     }
 }
